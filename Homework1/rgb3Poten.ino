@@ -17,6 +17,8 @@ int blueLedBrightness = 0;
 int greenLedBrightness = 0;
 int redLedBrightness = 0;
 
+#define ZERO 0
+
 void setup() {
   pinMode (blueLedPin, OUTPUT);
   pinMode (greenLedPin, OUTPUT);
@@ -36,9 +38,9 @@ void loop() { // I read the values from each potentiometer, map the values in th
   greenPotValue = analogRead (greenPotPin);
   redPotValue = analogRead (redPotPin);
 
-  blueLedBrightness = map (bluePotValue, 0, maxAnalogValue, 0, maxVoltageValue);
-  greenLedBrightness = map (greenPotValue, 0, maxAnalogValue, 0, maxVoltageValue);
-  redLedBrightness = map (redPotValue, 0, maxAnalogValue, 0, maxVoltageValue);
+  blueLedBrightness = map (bluePotValue, ZERO, maxAnalogValue, ZERO, maxVoltageValue);
+  greenLedBrightness = map (greenPotValue, ZERO, maxAnalogValue, ZERO, maxVoltageValue);
+  redLedBrightness = map (redPotValue, ZERO, maxAnalogValue, ZERO, maxVoltageValue);
   
   analogWrite (blueLedPin, blueLedBrightness);
   analogWrite (greenLedPin, greenLedBrightness);
