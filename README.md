@@ -14,4 +14,4 @@ Components:
 Setup
 ![homework1](https://user-images.githubusercontent.com/39190235/139116679-38ca5601-0ac2-4109-9bef-51a89c8fb082.jpeg)
 
-Functionality: https://www.youtube.com/watch?v=R6hMXtA7-6s
+Video showcase: https://www.youtube.com/watch?v=R6hMXtA7-6s
