@@ -10,27 +10,28 @@ const int state1Wait = 10000;
 const int state2Wait = 3000;
 const int state3Wait = 10000;
 const int state3BuzzInterval = 1000;
-const int state4Wait = 4000;
+const int state4Wait = 5000;
 const int state4BuzzInterval = 500;
 const int buzzerTone = 500;
 
 int systemState = 1;
 int state1ButtonPress = 0;
-int state1Timer = 0;
-int state2EnterTime = 0;
-int state2Timer = 0;
-int state3EnterTime = 0;
-int state3Timer = 0;
-int state4EnterTime = 0;
-int state4Timer = 0;
+int stateTimer = 0;
+int stateEnterTime = 0;
 int lastBuzzerChange = 0;
 
-bool buttonState = 0;
+unsigned int lastDebounceTime = 0;
+unsigned int debounceDelay = 50;
+
+bool buttonState = 1;
+bool reading = 1;
+bool lastReading = 1;
 bool buttonWasPressed = 0;
 bool enteredState2 = 0;
 bool enteredState3 = 0;
 bool enteredState4 = 0;
 bool isBuzzerOn = 0;
+
 
 void setup() {
   pinMode(pushButton, INPUT_PULLUP);
@@ -66,14 +67,31 @@ void loop() {
 void state1(){
   digitalWrite (carsGreenPin, HIGH);
   digitalWrite (pedestriansRedPin, HIGH);
-  buttonState = digitalRead(pushButton);
-  if (!buttonState && !buttonWasPressed){
-    state1ButtonPress = millis();
-    buttonWasPressed = 1;
+  reading = digitalRead(pushButton);
+
+  //check if the button was pressed. if it was pressed, i update buttonWasPressed and start the button timer
+  if (!buttonWasPressed){
+    if (reading != lastReading){
+      lastDebounceTime = millis();
+    }
+  
+    if (millis() - lastDebounceTime > debounceDelay){
+      if(reading != buttonState){
+        buttonState = reading;
+        if (buttonState == LOW){
+          state1ButtonPress = millis();
+          buttonWasPressed = 1;
+        }
+      }
+    }
+    lastReading = reading;
   }
+
+  
   if (buttonWasPressed){
-    state1Timer = millis();
-    if (state1Timer - state1ButtonPress >= state1Wait){
+    stateTimer = millis();
+    //when the state wait time passes i reset buttonWasPressed and change the state and stop the state led
+    if (stateTimer - state1ButtonPress >= state1Wait){ 
       systemState = 2;
       digitalWrite (carsGreenPin, LOW);
       buttonWasPressed = 0;
@@ -83,12 +101,14 @@ void state1(){
 
 void state2(){
   digitalWrite (carsYellowPin, HIGH);
+  //when i enter the state i start the timer
   if (!enteredState2){
     enteredState2 = 1;
-    state2EnterTime = millis();
+    stateEnterTime = millis();
   }
-  state2Timer = millis();
-  if (state2Timer - state2EnterTime >= state2Wait){
+  stateTimer = millis();
+  //when the state wait period ends i change the state value and turn off the state leds
+  if (stateTimer - stateEnterTime >= state2Wait){
     systemState = 3;
     digitalWrite (carsYellowPin, LOW);
     digitalWrite (pedestriansRedPin, LOW);
@@ -99,16 +119,18 @@ void state2(){
 void state3(){
   digitalWrite (carsRedPin, HIGH);
   digitalWrite (pedestriansGreenPin, HIGH);
+  //when i enter the state i start the timer and turn on the buzzer
   if (!enteredState3){
     enteredState3 = 1;
-    state3EnterTime = millis();
+    stateEnterTime = millis();
     lastBuzzerChange = millis();
     isBuzzerOn = 1;
     tone (buzzerPin, buzzerTone);
   }
-  state3Timer = millis();
+  stateTimer = millis();
 
-  if (state3Timer - lastBuzzerChange >= state3BuzzInterval){
+  // after the buzz interval time passes i switch the buzzer's state
+  if (stateTimer - lastBuzzerChange >= state3BuzzInterval){
     if (isBuzzerOn){
       noTone (buzzerPin);
       isBuzzerOn = 0;
@@ -119,8 +141,9 @@ void state3(){
     }
     lastBuzzerChange = millis();
   }
-
-  if (state3Timer - state3EnterTime >= state3Wait){
+  
+  // after the state wait time i turn off the buzzer again to be sure it won't keep on buzzing, then change the state
+  if (stateTimer - stateEnterTime >= state3Wait){
     if (isBuzzerOn){
       isBuzzerOn = 0;
       noTone (buzzerPin);
@@ -131,16 +154,17 @@ void state3(){
 }
 
 void state4(){
+  // same thing as state 3, but the buzz switches at a faster frequency and now the green pedestrian led switches toghetgher with the buzzer
   if (!enteredState4){
     enteredState4 = 1;
-    state4EnterTime = millis();
+    stateEnterTime = millis();
     lastBuzzerChange = millis();
     isBuzzerOn = 1;
     tone (buzzerPin, buzzerTone);
   }
-  state4Timer = millis();
+  stateTimer = millis();
 
-   if (state4Timer - lastBuzzerChange >= state4BuzzInterval){
+   if (stateTimer - lastBuzzerChange >= state4BuzzInterval){
     if (isBuzzerOn){
       noTone (buzzerPin);
       isBuzzerOn = 0;
@@ -154,7 +178,7 @@ void state4(){
     lastBuzzerChange = millis();
   }
 
-  if (state4Timer - state4EnterTime >= state4Wait){
+  if (stateTimer - stateEnterTime >= state4Wait){
     if (isBuzzerOn){
       isBuzzerOn = 0;
       noTone (buzzerPin);
