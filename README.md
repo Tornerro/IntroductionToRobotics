@@ -5,4 +5,5 @@ Laboratory homework for the Introduction to Robotics course taken in the 3rd yea
 ## Homeworks:
   1. [RGB led controlled by 3 potentiometeres](Homework1)
   2. [Crosswalk traffic lights](Homework2)
+  3. [Ghost detector (EMF detector)](Homework3)
 
