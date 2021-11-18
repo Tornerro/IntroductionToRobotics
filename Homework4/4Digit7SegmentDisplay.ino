@@ -136,7 +136,7 @@ void loop() {
         digits[currentDigit] = 0;
       }
   }
-  EEPROM.write(currentDigit, digits[currentDigit]);
+  EEPROM.update(currentDigit, digits[currentDigit]);
   writeNumber();
 }
 
@@ -162,10 +162,12 @@ void writeNumber() {
       else if(state == 1) {
         writeReg(digitArray[lastDigit]+1); // if the current digit from loop is the current display i am writing and the state is 1 the DP will be ON
     }
+    }
     delay(5);
     currentNumber /= 10;
     currentDisplay++;
   }
+
 }
 
 void writeReg(int digit){
